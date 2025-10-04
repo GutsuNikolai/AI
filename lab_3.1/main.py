@@ -36,7 +36,7 @@ def main():
 
         if not agents:
             running=False
-        clock.tick(60)
+        clock.tick(15)
 
     pg.quit()
 
