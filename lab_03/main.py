@@ -5,24 +5,23 @@ from agent import Agent
 from sim import step_agents
 from viz import init_window, draw_world, draw_agents
 
+W, H = P.win_w, P.win_h
+zones = [
+    (int(W * 0.35), int(H * 0), 80, 80),  # слева от круга
+    (int(W * 0.5), int(H * 0.5), 80, 80),  # сверху-справа от круга (между кругом и верхней колонной)
+    (int(W * 0.65), int(H * 0.85), 80, 80),  # справа-снизу от круга (у правой колонны)
+    (int(W * 0), int(H * 0.85), 80, 80),
+]
 
 def init_agents(n, world):
     import random, numpy as np
     rng = random.Random(P.seed)
     agents=[]
-    # три «красных» зоны (как на наброске)
-    W, H = P.win_w, P.win_h
-    zones = [
-        (int(W * 0.350), int(H * 0.25), 120, 120),  # слева от круга
-        (int(W * 0.55), int(H * 0.15), 120, 120),  # сверху-справа от круга (между кругом и верхней колонной)
-        (int(W * 0.70), int(H * 0.65), 140, 120),  # справа-снизу от круга (у правой колонны)
-    ]
-    # равномерно раскидаем по зонам
     for i in range(n):
-        zx, zy, zw, zh = zones[i % len(zones)]
-        x = rng.uniform(zx, zx+zw)
-        y = rng.uniform(zy, zy+zh)
-        pos = np.array([x,y], dtype=float)
+        x0, y0, w, h = zones[i % len(zones)]
+        x = rng.uniform(x0, x0 + w)
+        y = rng.uniform(y0, y0 + h)
+        pos = np.array([x, y], dtype=float)
         vel = np.zeros(2, dtype=float)
         agents.append(Agent(pos, vel))
     return agents
@@ -31,7 +30,8 @@ def init_agents(n, world):
 def main():
     screen = init_window(P.win_w, P.win_h)
     clock = pg.time.Clock()
-    world = World.custom_room(P.win_w, P.win_h)   # <-- НОВАЯ КОМНАТА
+    world = World.custom_room(P.win_w, P.win_h)
+    world.zones = zones# <-- НОВАЯ КОМНАТА
     agents = init_agents(P.n_agents, world)
 
     sim_time = 0.0

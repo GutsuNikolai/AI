@@ -2,7 +2,7 @@ import pygame as pg
 import numpy as np
 from config import P
 
-WHITE=(240,240,240); GREEN=(20,200,80); BLUE=(40,120,220); BLACK=(25,25,25)
+WHITE=(240,240,240); GREEN=(20,200,80); BLUE=(40,120,220); BLACK=(25,25,25);RED = (220, 60, 60)
 
 def init_window(w, h):
     pg.init()
@@ -12,7 +12,14 @@ def init_window(w, h):
 
 def draw_world(screen, world):
     screen.fill(WHITE)
-
+    # полупрозрачные красные прямоугольники для зон спавна
+    if hasattr(world, "zones"):
+        import pygame as pg
+        overlay = pg.Surface(screen.get_size(), pg.SRCALPHA)  # отдельный слой с альфой
+        for (x, y, w, h) in world.zones:
+            pg.draw.rect(overlay, (220, 60, 60, 70), pg.Rect(x, y, w, h), border_radius=10)  # RGBA, alpha=70
+            pg.draw.rect(overlay, (200, 40, 40, 180), pg.Rect(x, y, w, h), width=2, border_radius=10)
+        screen.blit(overlay, (0, 0))
     # --- прямоугольные стены ---
     if hasattr(world, "rects"):
         for r in world.rects:
