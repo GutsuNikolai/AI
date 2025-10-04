@@ -4,7 +4,7 @@ from dataclasses import dataclass
 class Params:
     # Simulation
     dt: float = 0.06
-    n_agents: int = 60
+    n_agents: int = 200
     seed: int = 7
     # Perception / behavior
     radius: float = 70.0          # pixels (visual radius)
