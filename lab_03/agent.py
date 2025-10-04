@@ -48,7 +48,7 @@ class Agent:
         s = self.separation_vec(neighbors) * P.w_sep
         a = self.alignment_vec(neighbors) * P.w_ali
         c = self.cohesion_vec(neighbors) * P.w_coh
-        w = world.wall_repulsion(self.pos, P.wall_d0) * P.w_wall
+        w = world.walls_repulsion(self.pos, P.wall_d0) * P.w_wall
 
         desire = g + s + a + c + w
         n = norm(desire)
@@ -63,6 +63,12 @@ class Agent:
 
         # propose move, then clamp & slide along walls
         proposed = self.pos + self.vel * P.dt
-        p2, v2 = world.clamp_and_slide(proposed, self.vel)
+
+        # 1) жёсткая коллизия с внутренними прямоугольниками (выталкивание + скольжение)
+        p2, v2 = world.resolve_rects_collision(proposed, self.vel)
+
+        # 2) внешняя рамка комнаты: за неё не вываливаемся, по ней скользим
+        p2, v2 = world.clamp_and_slide(p2, v2)
+
         self.pos = p2
         self.vel = v2

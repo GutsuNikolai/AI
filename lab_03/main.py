@@ -5,21 +5,33 @@ from agent import Agent
 from sim import step_agents
 from viz import init_window, draw_world, draw_agents
 
+
 def init_agents(n, world):
-    agents=[]
+    import random, numpy as np
     rng = random.Random(P.seed)
-    for _ in range(n):
-        x = rng.uniform(40, P.win_w*0.35)
-        y = rng.uniform(60, P.win_h-60)
+    agents=[]
+    # три «красных» зоны (как на наброске)
+    W, H = P.win_w, P.win_h
+    zones = [
+        (int(W * 0.350), int(H * 0.25), 120, 120),  # слева от круга
+        (int(W * 0.55), int(H * 0.15), 120, 120),  # сверху-справа от круга (между кругом и верхней колонной)
+        (int(W * 0.70), int(H * 0.65), 140, 120),  # справа-снизу от круга (у правой колонны)
+    ]
+    # равномерно раскидаем по зонам
+    for i in range(n):
+        zx, zy, zw, zh = zones[i % len(zones)]
+        x = rng.uniform(zx, zx+zw)
+        y = rng.uniform(zy, zy+zh)
         pos = np.array([x,y], dtype=float)
         vel = np.zeros(2, dtype=float)
         agents.append(Agent(pos, vel))
     return agents
 
+
 def main():
     screen = init_window(P.win_w, P.win_h)
     clock = pg.time.Clock()
-    world = World.simple_room(P.win_w, P.win_h)
+    world = World.custom_room(P.win_w, P.win_h)   # <-- НОВАЯ КОМНАТА
     agents = init_agents(P.n_agents, world)
 
     sim_time = 0.0
@@ -44,7 +56,7 @@ def main():
 
         if not agents:
             running=False
-        clock.tick(60)
+        clock.tick(15)
 
     print(f"Total sim time: {sim_time:.2f} s")
     pg.quit()
